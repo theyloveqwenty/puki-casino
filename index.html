@@ -71,11 +71,11 @@ body[data-cur=ton] .chip{background:radial-gradient(circle at 35% 30%,#bfeaff,#0
 .curseg button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 0;border-radius:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);font-size:11px;font-weight:700}
 .curseg button.on{border-color:var(--lime);background:rgba(200,255,62,.14);box-shadow:0 0 14px rgba(200,255,62,.25)}
 .curseg .chip{width:26px;height:26px}
-.curseg .chip[data-c=chip]{background:radial-gradient(circle at 35% 30%,#fff6b0,#ffd23f 45%,#c98a00);color:#6b4300;box-shadow:0 0 10px rgba(255,210,63,.5)}
-.curseg .chip[data-c=rub]{background:radial-gradient(circle at 35% 30%,#cfe0ff,#3b7bff 48%,#1a3fa8);color:#fff;box-shadow:0 0 10px rgba(59,123,255,.5)}
-.curseg .chip[data-c=uah]{background:linear-gradient(180deg,#4d8bff 0 50%,#ffd23f 50%);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);box-shadow:0 0 10px rgba(255,210,63,.4)}
-.curseg .chip[data-c=usdt]{background:radial-gradient(circle at 35% 30%,#b6f5df,#26a17b 48%,#0d5c44);color:#fff;box-shadow:0 0 10px rgba(38,161,123,.5)}
-.curseg .chip[data-c=ton]{background:radial-gradient(circle at 35% 30%,#bfeaff,#0098ea 48%,#00508a);color:#fff;box-shadow:0 0 10px rgba(0,152,234,.5)}
+:is(.curseg,.depc) .chip[data-c=chip]{background:radial-gradient(circle at 35% 30%,#fff6b0,#ffd23f 45%,#c98a00);color:#6b4300;box-shadow:0 0 10px rgba(255,210,63,.5)}
+:is(.curseg,.depc) .chip[data-c=rub]{background:radial-gradient(circle at 35% 30%,#cfe0ff,#3b7bff 48%,#1a3fa8);color:#fff;box-shadow:0 0 10px rgba(59,123,255,.5)}
+:is(.curseg,.depc) .chip[data-c=uah]{background:linear-gradient(180deg,#4d8bff 0 50%,#ffd23f 50%);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);box-shadow:0 0 10px rgba(255,210,63,.4)}
+:is(.curseg,.depc) .chip[data-c=usdt]{background:radial-gradient(circle at 35% 30%,#b6f5df,#26a17b 48%,#0d5c44);color:#fff;box-shadow:0 0 10px rgba(38,161,123,.5)}
+:is(.curseg,.depc) .chip[data-c=ton]{background:radial-gradient(circle at 35% 30%,#bfeaff,#0098ea 48%,#00508a);color:#fff;box-shadow:0 0 10px rgba(0,152,234,.5)}
 .topup{padding:10px 13px;font-size:13px;white-space:nowrap}
 .top{gap:6px;padding:6px}
 .logo{font-size:17px;padding:0 2px 0 8px}
@@ -408,6 +408,18 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
 .toast.on{transform:translate(-50%,0)}
 .toast.w{color:var(--win)}.toast.l{color:var(--lose)}
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:80}
+/* ---------- пополнение ---------- */
+.depin{display:flex;align-items:center;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:0 16px}
+.depin:focus-within{border-color:var(--lime)}
+.depin input{flex:1;min-width:0;background:none;border:0;outline:none;padding:15px 0;font:800 22px Unbounded,Inter,sans-serif}
+.depin span{font-weight:800;font-size:18px;color:var(--muted)}
+.depin input::-webkit-outer-spin-button,.depin input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.deperr{min-height:18px;margin-top:8px;font-size:12px;font-weight:700;color:var(--lose)}
+#dep1 .cta{margin-top:4px}
+.depc{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;margin-top:8px;border-radius:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);text-align:left;transition:border-color .2s,background .2s}
+.depc .chip{width:34px;height:34px;font-size:14px}
+.depc b{font-family:Unbounded;font-size:15px}
+.depc.on{border-color:var(--lime);background:rgba(200,255,62,.12);box-shadow:0 0 14px rgba(200,255,62,.2)}
 /* ---------- безопасные отступы в полноэкранном режиме Telegram ---------- */
 .app{padding-top:calc(10px + var(--tg-safe-area-inset-top,0px) + var(--tg-content-safe-area-inset-top,0px))}
 .gscreen .inner{padding-top:calc(10px + var(--tg-safe-area-inset-top,0px) + var(--tg-content-safe-area-inset-top,0px))}
@@ -675,7 +687,19 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
   <h3>Пополнить баланс</h3>
 
   <div class="glass card row" style="margin:14px 0 0"><span class="chip" style="width:40px;height:40px;font-size:16px"></span><div class="grow"><div class="muted">Сейчас на балансе</div><div class="big balv">0</div></div></div>
-  <div class="lbl" style="margin-top:14px">Валюта</div><div class="curseg" id="curSeg1"></div><div class="rate" id="rateInfo"></div>
+  <div id="dep1" style="margin-top:16px">
+    <div class="lbl"><span>Сумма пополнения</span><span id="depMin"></span></div>
+    <div class="depin"><input id="depAmt" type="number" inputmode="decimal" step="any" min="0" placeholder="0" autocomplete="off"><span id="depSym"></span></div>
+    <div class="seg" id="depQuick" style="margin-top:8px"></div>
+    <div class="deperr" id="depErr"></div>
+    <button class="gbtn cta" id="depOk">Подтвердить</button>
+  </div>
+  <div id="dep2" hidden style="margin-top:16px">
+    <div class="row" style="margin-bottom:10px"><button class="ghostbtn" id="depBack">← Сумма</button><div class="grow" style="text-align:right"><div class="muted" style="font-size:12px">Пополнение на</div><div class="big" id="depSum"></div></div></div>
+    <div class="lbl">Выбери валюту оплаты</div>
+    <div id="depList"></div>
+    <div class="rate" id="rateInfo"></div>
+  </div>
   <div id="packs"></div>
   <div class="glass card row" style="margin:14px 0 0;gap:12px"><div style="font-size:30px">🎟️</div><div class="grow muted" style="font-size:13px">Есть промокод? Введи его во вкладке <b style="color:#fff">«Бонусы»</b></div><button class="gbtn sbtn" data-tab="bonus" id="wPromo">Ввести</button></div>
 </div></div>
@@ -706,6 +730,7 @@ const fmt = n => { const c = (typeof S !== 'undefined' && S.cur) || 'usdt', d = 
   return r.toLocaleString('ru-RU', { minimumFractionDigits: d && Math.abs(r) < 1e5 ? d : 0, maximumFractionDigits: d && Math.abs(r) < 1e5 ? d : 0 }) };
 const cn = () => (CUR[(typeof S !== 'undefined' && S.cur)] || CUR.usdt).n;
 const M = n => fmt(n) + ' ' + cn();
+const UAH = v => v / (RATES.uah || 41.5); // гривны → USDT по текущему курсу
 const H = 36e5, DAY = 864e5;
 const GAMES = { mines:['💎','Мины'], bj:['🃏','Блэкджек'], crash:['🚀','Ракета'], dice:['🎲','Дайс'], plinko:['🔮','Плинко'], flight:['🛩️','Полёт'], up:['⚡','Апгрейд'], slot:['🎁','Gift Rush'], poop:['💩','Перебежка'], case:['🧰','Кейс'] };
 const CARDS = [
@@ -881,7 +906,7 @@ function closeGame(silent){
   if (busy[game]){ if (!silent){ toast('Сначала доиграй раунд', 'l'); haptic('err') } return false }
   $('g-' + game).classList.remove('on'); game = null; $('nav').classList.remove('hide'); document.body.style.overflow = ''; document.body.classList.remove('ingame'); backBtn(); return true;
 }
-function openSheet(name){ closeSheet(); sheet = name; $('sh-' + name).classList.add('on'); if (name === 'wallet') renderPacks(); haptic('light'); backBtn() }
+function openSheet(name){ closeSheet(); sheet = name; $('sh-' + name).classList.add('on'); if (name === 'wallet'){ renderPacks(); depReset() } haptic('light'); backBtn() }
 function closeSheet(){ if (!sheet) return; if (sheet === 'case' && caseBusy) return; $('sh-' + sheet).classList.remove('on'); sheet = null; backBtn() }
 function backBtn(){ if (!tg || !tg.BackButton) return; (game || sheet) ? tg.BackButton.show() : tg.BackButton.hide() }
 if (tg && tg.BackButton) tg.BackButton.onClick(() => sheet ? closeSheet() : closeGame());
@@ -927,6 +952,38 @@ const left = ms => { const h = Math.floor(ms / H), m = Math.ceil(ms % H / 6e4); 
 
 /* ======================= WALLET (free top-ups) ======================= */
 const PACKS = []; // бесплатные пополнения по таймеру убраны
+
+/* ---------- пополнение: сумма → подтвердить → выбор валюты (оплата пока не подключена) ---------- */
+const DEP_MIN_UAH = 50, DEP_QUICK_UAH = [50, 100, 250, 500];
+let depUsdt = 0, depPick = '';
+const curAmt = (usdt, c, up) => { const p = 10 ** DEC[c], v = usdt * RATES[c]; return (up ? Math.ceil(v * p - 1e-7) : Math.round(v * p)) / p };
+const curStr = (usdt, c) => curAmt(usdt, c, true).toLocaleString('ru-RU', { minimumFractionDigits: DEC[c], maximumFractionDigits: DEC[c] }) + ' ' + CUR[c].n;
+function depLabels(){
+  const c = S.cur, min = UAH(DEP_MIN_UAH);
+  $('depSym').textContent = CUR[c].n;
+  $('depMin').textContent = 'минимум ' + curStr(min, c);
+  $('depAmt').placeholder = curAmt(min, c, true);
+  $('depQuick').innerHTML = DEP_QUICK_UAH.map(v => `<button data-dq="${v}">${curAmt(UAH(v), c, true).toLocaleString('ru-RU')}</button>`).join('');
+}
+function depReset(){ depPick = ''; $('dep1').hidden = false; $('dep2').hidden = true; $('depErr').textContent = ''; $('depAmt').value = ''; depLabels() }
+$('depQuick').addEventListener('click', e => { const b = e.target.closest('[data-dq]'); if (!b) return; $('depAmt').value = curAmt(UAH(+b.dataset.dq), S.cur, true); $('depErr').textContent = ''; haptic('tick') });
+$('depAmt').addEventListener('input', () => $('depErr').textContent = '');
+$('depAmt').addEventListener('keydown', e => { if (e.key === 'Enter') $('depOk').click() });
+$('depOk').onclick = () => {
+  const v = parseFloat(String($('depAmt').value).replace(',', '.'));
+  const usdt = v / RATES[S.cur], min = UAH(DEP_MIN_UAH);
+  if (!(v > 0)){ $('depErr').textContent = 'Введи сумму пополнения'; haptic('err'); $('depAmt').focus(); return }
+  if (usdt < min * (1 - 1e-6)){ $('depErr').textContent = 'Минимальное пополнение: ' + curStr(min, S.cur); haptic('err'); return }
+  depUsdt = usdt; depPick = ''; $('depAmt').blur();
+  $('dep1').hidden = true; $('dep2').hidden = false; depList(); rateInfo(); haptic('light');
+};
+function depList(){
+  $('depSum').textContent = curStr(depUsdt, S.cur);
+  $('depList').innerHTML = Object.keys(CUR).map(k => `<button class="depc ${depPick === k ? 'on' : ''}" data-dc="${k}"><span class="chip" data-c="${k}" style="--cs:${JSON.stringify(CUR[k].s).replace(/"/g, '&quot;')}"></span><span class="grow"><b>${CUR[k].t}</b><div class="muted" style="font-size:12px">${{ usdt:'Tether', ton:'Toncoin', rub:'Российский рубль', uah:'Украинская гривна' }[k]}</div></span><b>${curStr(depUsdt, k)}</b></button>`).join('');
+}
+$('depList').addEventListener('click', e => { const b = e.target.closest('[data-dc]'); if (!b) return; depPick = b.dataset.dc; depList(); haptic('tick'); toast('Оплата пока не подключена') });
+$('depBack').onclick = () => { $('dep1').hidden = false; $('dep2').hidden = true; haptic('tick') };
+document.addEventListener('curchange', () => { if (sheet !== 'wallet') return; depLabels(); if (!$('dep2').hidden) depList() });
 function renderPacks(){
   $('packs').innerHTML = PACKS.map(p => {
     const rest = (S.packs[p.id] || 0) + p.cd - Date.now();
@@ -944,7 +1001,6 @@ $('packs').addEventListener('click', e => {
 const RC = ['#7a8099','#3d7bff','#3d7bff','#9b4dff','#ff3fb4','#ff4d4d','#ffc400'];
 const W = [25, 28, 22, 13, 8, 3, 1];
 // цены и призы задаются в гривнах и пересчитываются в USDT по текущему курсу (отдача платных ≈93%)
-const UAH = v => v / (RATES.uah || 41.5);
 const CASES_UAH = [
   { id:'free',  name:'Бесплатный', price:0,   e:'🎁', glow:'#3dfc9f', prizes:[1,2,3,5,10,25,50], w:[30,28,20,12,6,3,1] },
   { id:'bronze',name:'Бронзовый',  price:10,  e:'📦', glow:'#ff9a3d', prizes:[2,5,8,12,20,50,100], w:W },
@@ -1407,6 +1463,9 @@ const plinko = (() => {
     balls = balls.filter(b => {
       const t = (now - b.t0) / STEP, seg = Math.floor(t), f = t - seg;
       const kx = r => r < 0 ? Wd / 2 : Wd / 2 + (b.path[r] - (r + 1) / 2) * gap, ky = r => rowY(r + 1 - 1.5) - gap * .35;
+      if (seg >= ROWS && t < ROWS + 1.3){ // последний отрезок: шарик падает в лунку и на миг лежит в ней
+        const lx = kx(ROWS - 1), ly = ky(ROWS - 1), ty = rowY(ROWS + .2) + gap * .4, g = Math.min(1, t - ROWS);
+        b.x = lx; b.y = ly + (ty - ly) * g * g; return true }
       if (seg >= ROWS){ const m = MULTS[b.slot]; flashes[b.slot] = performance.now() + 300; pay(b.bet, b.bet * m, 'plinko'); if (m >= 5) confetti(); haptic(m >= 1 ? 'medium' : 'light'); return false }
       const ax = kx(seg - 1), ay = seg === 0 ? rowY(-1.2) : ky(seg - 1), bx = kx(seg), by = ky(seg);
       b.x = ax + (bx - ax) * f; b.y = ay + (by - ay) * f - Math.sin(f * Math.PI) * gap * .35;
