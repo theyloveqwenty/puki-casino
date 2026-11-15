@@ -229,7 +229,8 @@ body[data-cur=ton] .chip{background:radial-gradient(circle at 35% 30%,#bfeaff,#0
 .nav button.on{color:#fff}
 .nav button.on .i{transform:scale(1.12)}
 .nav .pill{position:absolute;top:7px;bottom:7px;left:7px;width:calc((100% - 14px)/4);border-radius:999px;background:linear-gradient(135deg,rgba(255,255,255,.28),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 4px 14px rgba(0,0,0,.25);transition:transform .45s cubic-bezier(.3,1.4,.5,1)}
-.nav .badge{position:absolute;top:2px;left:50%;transform:translateX(-10%);background:var(--gold);color:#3a2500;font-size:9px;font-weight:800;padding:1px 6px;border-radius:9px}
+.nav .badge{position:absolute;top:0;left:50%;transform:translateX(-5%);background:var(--lime);color:#0a1606;font-size:9px;font-weight:900;padding:2px 7px;border-radius:9px;box-shadow:0 0 10px rgba(200,255,62,.7);animation:fpulse 1.6s ease-in-out infinite}
+@keyframes fpulse{50%{box-shadow:0 0 18px rgba(200,255,62,1);transform:translateX(-5%) scale(1.08)}}
 
 /* ---------- game screens (overlay) ---------- */
 .gscreen{display:none;position:fixed;inset:0;z-index:40;overflow-y:auto;background:
@@ -468,7 +469,7 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
   <section class="tab on" id="t-games">
     <div class="hero" id="hero">
       <div class="slide sl1"><div><h3>Полёт с ракетами</h3><p>Лови иксы, уворачивайся от ракет и садись на авианосец</p></div><button class="gbtn" data-go="flight">Взлететь ›</button><div class="art">🛩️</div></div>
-      <div class="slide sl2"><div><h3>Бесплатный кейс</h3><p>Открывай раз в 4 часа, внутри до 50 ₴ на баланс</p></div><button class="gbtn" data-tab="cases">Открыть ›</button><div class="art">🧰</div></div>
+      <div class="slide sl2"><div><h3>Бесплатный кейс</h3><p>Открывай раз в 24 часа, внутри до 50 ₴ на баланс</p></div><button class="gbtn" data-tab="cases">Открыть ›</button><div class="art">🧰</div></div>
       <div class="slide sl3"><div><h3>Новинка: Перебежка</h3><p>Какашка прыгает через дорогу. Успей забрать, пока не сбили!</p></div><button class="gbtn" data-go="poop">Играть ›</button><div class="art">💩</div></div>
     </div>
     <div class="dots" id="dots"><i class="on"></i><i></i><i></i></div>
@@ -1015,26 +1016,23 @@ const W = [25, 28, 22, 13, 8, 3, 1];
 // цены и призы задаются в гривнах и пересчитываются в USDT по текущему курсу (отдача платных ≈93%)
 const CASES_UAH = [
   { id:'free',  name:'Бесплатный', price:0,   e:'🎁', glow:'#3dfc9f', prizes:[1,2,3,5,10,25,50], w:[30,28,20,12,6,3,1] },
-  { id:'bronze',name:'Бронзовый',  price:10,  e:'📦', glow:'#ff9a3d', prizes:[2,5,8,12,20,50,100], w:W },
-  { id:'gold',  name:'Золотой',    price:50,  e:'🧰', glow:'#ffd23f', prizes:[10,25,40,60,100,250,500], w:W },
-  { id:'diam',  name:'Алмазный',   price:200, e:'💠', glow:'#4fd5ff', prizes:[40,100,160,240,400,1000,2000], w:W },
 ];
 const CASES = CASES_UAH.map(c => ({ ...c, get price(){ return UAH(c.price) }, get prizes(){ return c.prizes.map(UAH) } }));
-const FREE_CD = 4 * H;
+const FREE_CD = 24 * H;
 let caseCur = null, caseBusy = false;
 function renderCases(){
   $('caseGrid').innerHTML = CASES.map(c => {
     const rest = c.price ? 0 : S.freeCase + FREE_CD - Date.now();
     return `<div class="case glass" style="--glow:${c.glow}"><div class="cimg">${c.e}</div><b>${c.name}</b>
       <button class="gbtn" data-case="${c.id}">${c.price ? `<span class="chip"></span>${fmt(c.price)}` : rest > 0 ? '⏳ ' + left(rest) : 'Бесплатно'}</button></div>`;
-  }).join('');
+  }).join('') + `<div class="case glass" style="--glow:#8a90b8;opacity:.6"><div class="cimg">🔒</div><b>Скоро</b><div class="muted" style="font-size:12px;padding:10px 0 4px">Новые кейсы в пути</div></div>`;
 }
 function caseBadgeUpd(){ $('caseBadge').style.display = S.freeCase + FREE_CD <= Date.now() ? '' : 'none' }
 $('caseGrid').addEventListener('click', e => {
   const b = e.target.closest('[data-case]'); if (!b) return;
   caseCur = CASES.find(c => c.id === b.dataset.case);
   $('caseTitle').textContent = caseCur.e + ' ' + caseCur.name + ' кейс';
-  $('caseSub').textContent = caseCur.price ? 'Стоимость: ' + fmt(caseCur.price) + ' ' + cn() : 'Открывается бесплатно раз в 4 часа';
+  $('caseSub').textContent = caseCur.price ? 'Стоимость: ' + fmt(caseCur.price) + ' ' + cn() : 'Открывается бесплатно раз в 24 часа';
   const tot = caseCur.w.reduce((a, b) => a + b, 0);
   $('plist').innerHTML = caseCur.prizes.map((p, i) => `<div class="prize" style="--rc:${RC[i]}">${fmt(p)}<small>${(caseCur.w[i] / tot * 100).toFixed(caseCur.w[i] / tot < .02 ? 1 : 0)}%</small></div>`).join('');
   fillStrip(null); caseBtn(); openSheet('case');
