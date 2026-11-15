@@ -275,7 +275,7 @@ input[type=range]{accent-color:var(--lime)!important}
 
 /* blackjack — casino felt */
 .felt{position:relative;border-radius:30px 30px 160px 160px/30px 30px 70px 70px;padding:14px 12px 22px;min-height:440px;overflow:hidden;
-  background:radial-gradient(120% 80% at 50% 35%,#16834c,#0d5a34 55%,#063821 100%);
+  background:radial-gradient(120% 80% at 50% 35%,#1f63c4,#123f8a 55%,#0a2557 100%);
   box-shadow:inset 0 0 0 6px #5a3417,inset 0 0 0 8px #c9a15a,inset 0 0 0 9px #3a200c,inset 0 10px 40px rgba(0,0,0,.45),0 14px 30px rgba(0,0,0,.45)}
 .felt::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.18;background-image:radial-gradient(rgba(0,0,0,.6) 1px,transparent 1.2px);background-size:4px 4px}
 .shoe{position:absolute;top:16px;right:16px;width:54px;height:40px;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,#2b1a0d,#130b05);box-shadow:inset 0 0 0 2px #c9a15a,0 4px 10px rgba(0,0,0,.4);transform:rotate(-8deg)}
@@ -299,7 +299,10 @@ input[type=range]{accent-color:var(--lime)!important}
 .spot .pchip{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:900 10px Unbounded;color:#fff;background:radial-gradient(circle,#d4283f 52%,#fff 53% 60%,#d4283f 61%);box-shadow:0 4px 0 #7a0f1f,0 6px 12px rgba(0,0,0,.4);animation:chipin .35s cubic-bezier(.2,1.4,.4,1)}
 @keyframes chipin{from{transform:translateY(60px) scale(.5);opacity:0}}
 .phands,.dzone,.bjmsg,.arc{position:relative;z-index:1}
-.pcard{position:relative;width:58px;height:84px;border-radius:8px;background:linear-gradient(160deg,#fff,#f1efe8);color:#161616;margin-left:-22px;box-shadow:0 1px 0 #d6d3c8,0 5px 12px rgba(0,0,0,.4);animation:deal .38s cubic-bezier(.2,.9,.3,1.05) both;font-family:Georgia,"Times New Roman",serif}
+.pcard{position:relative;width:58px;height:84px;border-radius:8px;background:linear-gradient(160deg,#fff,#f1efe8);color:#161616;margin-left:-22px;box-shadow:0 1px 0 #d6d3c8,0 5px 12px rgba(0,0,0,.4);font-family:Georgia,"Times New Roman",serif;backface-visibility:hidden;transform:translateZ(0)}
+.pcard.deal{animation:deal .5s cubic-bezier(.22,.8,.3,1) both;will-change:transform,opacity}
+.pcard.flip{animation:flip .42s cubic-bezier(.3,.7,.3,1) both}
+@keyframes flip{0%{transform:perspective(400px) rotateY(90deg)}100%{transform:perspective(400px) rotateY(0)}}
 .pcard:first-child{margin-left:0}
 .pcard .ix{position:absolute;left:5px;top:4px;display:flex;flex-direction:column;align-items:center;line-height:.95;font-weight:700;font-size:15px}
 .pcard .ix small{font-size:12px}
@@ -310,7 +313,7 @@ input[type=range]{accent-color:var(--lime)!important}
 .pcard.back{background:#7a1020;border:3px solid #fff}
 .pcard.back::after{content:"";position:absolute;inset:4px;border-radius:4px;background:repeating-linear-gradient(45deg,rgba(255,255,255,.18) 0 3px,transparent 3px 7px),radial-gradient(circle,#c8ff3e 0 6px,transparent 7px)}
 .pcard.back *{display:none}
-@keyframes deal{from{opacity:0;transform:translate(130px,-170px) rotate(25deg)}}
+@keyframes deal{0%{opacity:0;transform:translate3d(110px,-150px,0) rotate(14deg) scale(.92)}35%{opacity:1}100%{opacity:1;transform:translate3d(0,0,0) rotate(0) scale(1)}}
 .bjact{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .bja{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 2px;border-radius:18px;font-weight:700;font-size:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:transform .12s,opacity .2s}
 .bja b{font-size:18px;font-family:Unbounded}
@@ -405,6 +408,35 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
 .toast.on{transform:translate(-50%,0)}
 .toast.w{color:var(--win)}.toast.l{color:var(--lose)}
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:80}
+/* ---------- безопасные отступы в полноэкранном режиме Telegram ---------- */
+.app{padding-top:calc(10px + var(--tg-safe-area-inset-top,0px) + var(--tg-content-safe-area-inset-top,0px))}
+.gscreen .inner{padding-top:calc(10px + var(--tg-safe-area-inset-top,0px) + var(--tg-content-safe-area-inset-top,0px))}
+.top{top:calc(8px + var(--tg-safe-area-inset-top,0px) + var(--tg-content-safe-area-inset-top,0px))}
+
+/* ---------- компьютер / горизонтальный экран (16:9) ---------- */
+@media (min-width:900px) and (min-aspect-ratio:5/4){
+  .app{max-width:1200px;padding-left:28px;padding-right:28px}
+  .ggrid{grid-template-columns:repeat(4,1fr);gap:16px}
+  .cgrid{grid-template-columns:repeat(4,1fr);gap:16px}
+  .slide{flex:0 0 calc(50% - 5px);height:210px}
+  #t-bonus>.glass,#t-profile{max-width:760px;margin-left:auto;margin-right:auto}
+  .icard:hover{transform:translateY(-3px)}
+  /* игры: поле слева, управление справа */
+  .gscreen .inner{max-width:1200px;padding-left:28px;padding-right:28px;display:grid;grid-template-columns:minmax(0,1fr) 380px;column-gap:20px;align-items:start}
+  .gscreen .inner>*{grid-column:1}
+  .gscreen .inner>.ghead{grid-column:1/-1}
+  .gscreen .inner>.panel:last-child{grid-column:2;grid-row:2/span 8;margin-top:0!important;position:sticky;top:20px}
+  .crashbox{height:min(560px,calc(100vh - 190px))}
+  .flightbox{height:min(520px,calc(100vh - 250px))}
+  .poopbox{height:min(560px,calc(100vh - 210px))}
+  .plinkobox{width:min(100%,calc((100vh - 120px) / 1.04));margin:0 auto}
+  .felt{min-height:min(560px,calc(100vh - 130px));padding-bottom:100px;display:flex;flex-direction:column;justify-content:center}
+  .felt .arc{max-width:520px;margin-left:auto;margin-right:auto}
+  .pcard{width:70px;height:100px;margin-left:-24px}
+  .pcard .mid{font-size:34px}
+  .wheel{width:min(360px,50vh)}
+  .sheet .body{max-height:92vh}
+}
 </style>
 </head>
 <body>
@@ -424,7 +456,7 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
   <section class="tab on" id="t-games">
     <div class="hero" id="hero">
       <div class="slide sl1"><div><h3>Полёт с ракетами</h3><p>Лови иксы, уворачивайся от ракет и садись на авианосец</p></div><button class="gbtn" data-go="flight">Взлететь ›</button><div class="art">🛩️</div></div>
-      <div class="slide sl2"><div><h3>Бесплатный кейс</h3><p>Открывай раз в 4 часа, внутри до 1 000 на баланс</p></div><button class="gbtn" data-tab="cases">Открыть ›</button><div class="art">🧰</div></div>
+      <div class="slide sl2"><div><h3>Бесплатный кейс</h3><p>Открывай раз в 4 часа, внутри до 50 ₴ на баланс</p></div><button class="gbtn" data-tab="cases">Открыть ›</button><div class="art">🧰</div></div>
       <div class="slide sl3"><div><h3>Новинка: Перебежка</h3><p>Какашка прыгает через дорогу. Успей забрать, пока не сбили!</p></div><button class="gbtn" data-go="poop">Играть ›</button><div class="art">💩</div></div>
     </div>
     <div class="dots" id="dots"><i class="on"></i><i></i><i></i></div>
@@ -444,7 +476,10 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
   <!-- ============ BONUS TAB ============ -->
   <section class="tab" id="t-bonus">
     <div class="h">Бонусы</div>
-    <div class="glass card" style="text-align:center;padding:40px 20px"><div style="font-size:52px">🎁</div><div class="big" style="margin-top:8px">Скоро тут будет</div><div class="muted" style="margin-top:6px">Бонусы появятся позже</div></div>
+    <div class="glass card">
+      <div class="row" style="margin-bottom:12px"><div class="grow"><div class="big">Промокод</div><div class="muted">Введи код и получи бонус на баланс</div></div><div style="font-size:40px">🎟️</div></div>
+      <div class="promo"><input id="promoIn" placeholder="Введи промокод" maxlength="16" autocomplete="off" enterkeyhint="done"><button class="gbtn sbtn" id="promoBtn">Ввести</button></div>
+    </div>
     <div hidden>
     <div class="glass card">
       <div class="row"><div class="grow"><div class="big">Ежедневный</div><div class="muted" id="streakTxt">Серия: 0 дней</div></div><div style="font-size:44px">📅</div></div>
@@ -453,11 +488,6 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
     </div>
     <div class="h" style="font-size:18px">Задания</div>
     <div id="tasks"></div>
-    <div class="h" style="font-size:18px">Промокод</div>
-    <div class="glass card">
-      <div class="promo"><input id="promoIn" placeholder="Введи промокод" maxlength="16"><button class="gbtn sbtn" id="promoBtn">Ввести</button></div>
-      <div class="muted" style="margin-top:8px">Подсказка: попробуй <b>PUKI</b> 😉</div>
-    </div>
   </div>
   </section>
 
@@ -647,6 +677,7 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
   <div class="glass card row" style="margin:14px 0 0"><span class="chip" style="width:40px;height:40px;font-size:16px"></span><div class="grow"><div class="muted">Сейчас на балансе</div><div class="big balv">0</div></div></div>
   <div class="lbl" style="margin-top:14px">Валюта</div><div class="curseg" id="curSeg1"></div><div class="rate" id="rateInfo"></div>
   <div id="packs"></div>
+  <div class="glass card row" style="margin:14px 0 0;gap:12px"><div style="font-size:30px">🎟️</div><div class="grow muted" style="font-size:13px">Есть промокод? Введи его во вкладке <b style="color:#fff">«Бонусы»</b></div><button class="gbtn sbtn" data-tab="bonus" id="wPromo">Ввести</button></div>
 </div></div>
 
 <div class="sheet" id="sh-case"><div class="bd"></div><div class="body glass">
@@ -895,11 +926,7 @@ function confetti(){
 const left = ms => { const h = Math.floor(ms / H), m = Math.ceil(ms % H / 6e4); return h ? `${h}ч ${m}м` : `${m}м` };
 
 /* ======================= WALLET (free top-ups) ======================= */
-const PACKS = [
-  { id:'s', amt:50,   cd:1 * H,  name:'Мелочь',    e:'🪙' },
-  { id:'m', amt:150,  cd:6 * H,  name:'Пачка',     e:'💰' },
-  { id:'l', amt:500,  cd:24 * H, name:'Чемодан',   e:'💼' },
-];
+const PACKS = []; // бесплатные пополнения по таймеру убраны
 function renderPacks(){
   $('packs').innerHTML = PACKS.map(p => {
     const rest = (S.packs[p.id] || 0) + p.cd - Date.now();
@@ -916,12 +943,15 @@ $('packs').addEventListener('click', e => {
 /* ======================= CASES ======================= */
 const RC = ['#7a8099','#3d7bff','#3d7bff','#9b4dff','#ff3fb4','#ff4d4d','#ffc400'];
 const W = [25, 28, 22, 13, 8, 3, 1];
-const CASES = [
-  { id:'free',  name:'Бесплатный', price:0,    e:'🎁', glow:'#3dfc9f', prizes:[5,10,15,25,50,75,100], w:[30,28,20,12,6,3,1] },
-  { id:'bronze',name:'Бронзовый',  price:10,   e:'📦', glow:'#ff9a3d', prizes:[2,5,8,12,20,50,100], w:W },
-  { id:'gold',  name:'Золотой',    price:50,   e:'🧰', glow:'#ffd23f', prizes:[10,25,40,60,100,250,500], w:W },
-  { id:'diam',  name:'Алмазный',   price:250,  e:'💠', glow:'#4fd5ff', prizes:[50,125,200,300,500,1250,2500], w:W },
+// цены и призы задаются в гривнах и пересчитываются в USDT по текущему курсу (отдача платных ≈93%)
+const UAH = v => v / (RATES.uah || 41.5);
+const CASES_UAH = [
+  { id:'free',  name:'Бесплатный', price:0,   e:'🎁', glow:'#3dfc9f', prizes:[1,2,3,5,10,25,50], w:[30,28,20,12,6,3,1] },
+  { id:'bronze',name:'Бронзовый',  price:10,  e:'📦', glow:'#ff9a3d', prizes:[2,5,8,12,20,50,100], w:W },
+  { id:'gold',  name:'Золотой',    price:50,  e:'🧰', glow:'#ffd23f', prizes:[10,25,40,60,100,250,500], w:W },
+  { id:'diam',  name:'Алмазный',   price:200, e:'💠', glow:'#4fd5ff', prizes:[40,100,160,240,400,1000,2000], w:W },
 ];
+const CASES = CASES_UAH.map(c => ({ ...c, get price(){ return UAH(c.price) }, get prizes(){ return c.prizes.map(UAH) } }));
 const FREE_CD = 4 * H;
 let caseCur = null, caseBusy = false;
 function renderCases(){
@@ -1015,13 +1045,17 @@ $('tasks').addEventListener('click', e => {
   S.tasks[id] = 1; S.bal += t.r; save(); render(true); renderTasks(); haptic('ok'); confetti(); toast('Задание выполнено: +' + fmt(t.r), 'w'); taskBadge();
 });
 function taskBadge(){}
-const PROMOS = { PUKI: 1000, LUCKY: 777, GLASS: 500 };
+// промокоды: КОД → сумма в гривнах; каждый код можно активировать один раз
+const PROMOS = { PUKI: 50, START: 25 };
 $('promoBtn').onclick = () => {
   const c = $('promoIn').value.trim().toUpperCase();
+  if (!c){ $('promoIn').focus(); return }
   if (!PROMOS[c]){ toast('Такого промокода нет', 'l'); haptic('err'); return }
   if (S.promo[c]){ toast('Этот промокод уже использован', 'l'); haptic('err'); return }
-  S.promo[c] = 1; S.bal += PROMOS[c]; save(); render(true); $('promoIn').value = ''; haptic('ok'); confetti(); toast('Промокод активирован: +' + fmt(PROMOS[c]), 'w');
+  const amt = UAH(PROMOS[c]);
+  S.promo[c] = 1; S.bal = r6(S.bal + amt); save(); render(true); $('promoIn').value = ''; $('promoIn').blur(); haptic('ok'); confetti(); toast('Промокод активирован: +' + M(amt), 'w');
 };
+$('promoIn').addEventListener('keydown', e => { if (e.key === 'Enter') $('promoBtn').click() });
 
 /* ======================= PROFILE ======================= */
 const user = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
@@ -1104,7 +1138,7 @@ const bj = (() => {
   const cv = r => r === 'A' ? 11 : ['J','Q','K'].includes(r) ? 10 : +r;
   function newShoe(){ shoe = []; for (let d = 0; d < 6; d++) for (const s of SUITS) for (const r of RANKS) shoe.push({ r, s });
     for (let i = shoe.length - 1; i > 0; i--){ const j = Math.random() * (i + 1) | 0; [shoe[i], shoe[j]] = [shoe[j], shoe[i]] } }
-  const draw = () => { if (shoe.length < 78) newShoe(); return shoe.pop() };
+  const draw = () => { if (shoe.length < 78) newShoe(); const c = shoe.pop(); return { r: c.r, s: c.s } };
   function val(cards){ let t = 0, a = 0; for (const c of cards){ t += cv(c.r); if (c.r === 'A') a++ } while (t > 21 && a){ t -= 10; a-- } return { t, soft: a > 0 } }
   const isBJ = (h) => h.cards.length === 2 && !h.split && val(h.cards).t === 21;
   const dealerBJ = D => D.length === 2 && val(D).t === 21;
@@ -1123,10 +1157,14 @@ const bj = (() => {
 
   /* ---------- UI ---------- */
   let H = [], D = [], act = 0, hidden = true, live = false, baseBet = 0, total = 0;
+  // анимируем только новые карты (и переворот закрытой), уже лежащие на столе не трогаем
   const cardHTML = (c, back) => {
     const red = c.s === '♥' || c.s === '♦', face = ['J','Q','K'].includes(c.r);
     const mid = face ? `<div class="face">${c.r}</div>` : `<div class="mid">${c.r === 'A' ? '<span style="font-size:34px">' + c.s + '</span>' : c.s}</div>`;
-    return `<div class="pcard ${red ? 'red' : ''} ${back ? 'back' : ''}"><div class="ix">${c.r}<small>${c.s}</small></div>${mid}<div class="ix b">${c.r}<small>${c.s}</small></div></div>`;
+    const anim = !c._on ? 'deal' : (c._back && !back ? 'flip' : '');
+    const delay = !c._on && c._d ? ` style="animation-delay:${c._d}ms"` : '';
+    c._on = true; c._back = !!back; c._d = 0;
+    return `<div class="pcard ${anim} ${red ? 'red' : ''} ${back ? 'back' : ''}"${delay}><div class="ix">${c.r}<small>${c.s}</small></div>${mid}<div class="ix b">${c.r}<small>${c.s}</small></div></div>`;
   };
   function render(){
     $('bjD').innerHTML = D.map((c, i) => cardHTML(c, i === 1 && hidden)).join('');
@@ -1153,6 +1191,7 @@ const bj = (() => {
   function deal(){
     baseBet = bets.bj.get(); if (!take(baseBet, 'bj')) return;
     total = baseBet; H = [{ cards: [draw()], bet: baseBet }]; D = [draw()]; H[0].cards.push(draw()); D.push(draw());
+    H[0].cards[0]._d = 0; D[0]._d = 160; H[0].cards[1]._d = 320; D[1]._d = 480; // раздача по очереди
     act = 0; hidden = true; live = true; busy.bj = true; msg('');
     $('bjSpot').classList.add('on'); $('bjSpot').innerHTML = `<div class="pchip">${fmt(baseBet)}</div>`;
     render(); ui(); haptic('medium');
@@ -1778,6 +1817,10 @@ const poop = (() => {
 
 /* ---------- boot ---------- */
 if (tg){ try{ tg.ready(); tg.expand(); tg.setHeaderColor('#0b0820'); tg.setBackgroundColor('#0b0820'); if (tg.disableVerticalSwipes) tg.disableVerticalSwipes() }catch(e){} }
+// на компьютере открываем на весь экран (16:9), на телефоне остаётся обычный вертикальный вид
+if (tg && ['tdesktop','macos'].includes(tg.platform) && tg.requestFullscreen && tg.isVersionAtLeast && tg.isVersionAtLeast('8.0')){
+  try{ tg.requestFullscreen() }catch(e){}
+}
 load(() => { migrate(); setCur(S.cur); renderTicker(); caseBadgeUpd(); loadRates() });
 setInterval(() => { caseBadgeUpd(); if (sheet === 'wallet') renderPacks(); if (current === 'cases') renderCases(); if (current === 'bonus' && !game) renderBonus(); if (sheet === 'case' && caseCur) caseBtn() }, 30000);
 </script>
