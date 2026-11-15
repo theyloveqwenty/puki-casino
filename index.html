@@ -459,7 +459,7 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
 <div class="app">
   <div class="top glass">
     <div class="logo"><svg viewBox="0 0 32 32"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ecff7a"/><stop offset=".55" stop-color="#c8ff3e"/><stop offset="1" stop-color="#3ee8ff"/></linearGradient></defs><rect x="3" y="3" width="26" height="26" rx="9" fill="url(#lg)" transform="rotate(-10 16 16)"/><path d="M16 7.5c.9 4.6 2.9 6.6 7.5 7.5-4.6.9-6.6 2.9-7.5 7.5-.9-4.6-2.9-6.6-7.5-7.5 4.6-.9 6.6-2.9 7.5-7.5z" fill="#06120a"/></svg><i>PUKI</i></div>
-    <button class="balpill press" data-sheet="wallet"><span class="chip"></span><span class="balv">0</span><span class="car">▼</span></button>
+    <button class="balpill press" data-sheet="cur" aria-label="Валюта отображения"><span class="chip"></span><span class="balv">0</span><span class="car">▼</span></button>
     <button class="gbtn topup" data-sheet="wallet">Пополнить</button>
     <button class="ava press" data-tab="profile" id="avaTop"></button>
   </div>
@@ -704,6 +704,14 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
   <div class="glass card row" style="margin:14px 0 0;gap:12px"><div style="font-size:30px">🎟️</div><div class="grow muted" style="font-size:13px">Есть промокод? Введи его во вкладке <b style="color:#fff">«Бонусы»</b></div><button class="gbtn sbtn" data-tab="bonus" id="wPromo">Ввести</button></div>
 </div></div>
 
+<div class="sheet" id="sh-cur"><div class="bd"></div><div class="body glass">
+  <div class="grab"></div>
+  <h3>Валюта отображения</h3>
+  <div class="muted" style="margin-top:4px">Баланс один и тот же, меняется только то, в какой валюте он показан</div>
+  <div id="curList" style="margin-top:8px"></div>
+  <div class="rate" id="rateInfo2"></div>
+</div></div>
+
 <div class="sheet" id="sh-case"><div class="bd"></div><div class="body glass">
   <div class="grab"></div>
   <h3 id="caseTitle">Кейс</h3>
@@ -809,7 +817,7 @@ const MINBET = .01;
 const r6 = v => Math.round(v * 1e6) / 1e6;
 function take(bet, game){
   if (!(bet >= MINBET - 1e-9)) { toast('Минимальная ставка: ' + M(MINBET), 'l'); haptic('err'); return false }
-  if (bet > S.bal + 1e-9) { toast('Не хватает средств, пополни баланс', 'l'); haptic('err'); setTimeout(() => openSheet('wallet'), 500); return false }
+  if (bet > S.bal + 1e-9) { toast('Не хватает средств на балансе', 'l'); haptic('err'); return false }
   S.bal = Math.max(0, r6(S.bal - bet)); S.played++; S.wagered = r6(S.wagered + bet); S.tried[game] = 1; save(); render(); return true;
 }
 function pay(bet, amount, game){
@@ -835,9 +843,8 @@ function setCur(c){
 }
 document.addEventListener("click", e => { const b = e.target.closest("[data-cur]"); if (!b || !b.parentElement.classList.contains("curseg")) return; setCur(b.dataset.cur); save(); haptic("tick"); toast("Валюта: " + CUR[S.cur].t) });
 function rateInfo(){
-  const el = $("rateInfo"); if (!el) return;
   const t = RATES_T ? new Date(RATES_T).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "—";
-  el.innerHTML = `1 USDT = <b>${RATES.rub.toFixed(2)} ₽</b> · <b>${RATES.uah.toFixed(2)} ₴</b> · <b>${RATES.ton.toFixed(3)} TON</b><br><span>${RATES_LIVE ? "Курс обновлён " + t : "Курс примерный: не удалось загрузить живой"}</span>`;
+  ["rateInfo", "rateInfo2"].forEach(id => { const el = $(id); if (el) el.innerHTML = `1 USDT = <b>${RATES.rub.toFixed(2)} ₽</b> · <b>${RATES.uah.toFixed(2)} ₴</b> · <b>${RATES.ton.toFixed(3)} TON</b><br><span>${RATES_LIVE ? "Курс обновлён " + t : "Курс примерный: не удалось загрузить живой"}</span>` });
 }
 async function loadRates(force){
   try{ const c = JSON.parse(localStorage.getItem("puki_rates") || "null"); if (c && c.r){ Object.assign(RATES, c.r); RATES_T = c.t; RATES_LIVE = true; if (!force && Date.now() - c.t < 36e5){ Object.values(bets).forEach(b => b.refresh()); rateInfo(); render(); document.dispatchEvent(new Event("curchange")); return } } }catch(e){}
@@ -906,7 +913,12 @@ function closeGame(silent){
   if (busy[game]){ if (!silent){ toast('Сначала доиграй раунд', 'l'); haptic('err') } return false }
   $('g-' + game).classList.remove('on'); game = null; $('nav').classList.remove('hide'); document.body.style.overflow = ''; document.body.classList.remove('ingame'); backBtn(); return true;
 }
-function openSheet(name){ closeSheet(); sheet = name; $('sh-' + name).classList.add('on'); if (name === 'wallet'){ renderPacks(); depReset() } haptic('light'); backBtn() }
+function openSheet(name){ closeSheet(); sheet = name; $('sh-' + name).classList.add('on'); if (name === 'wallet'){ renderPacks(); depReset() } if (name === 'cur'){ curList(); rateInfo() } haptic('light'); backBtn() }
+// выбор валюты отображения: баланс хранится в USDT, показывается в выбранной валюте
+function curList(){
+  $('curList').innerHTML = Object.keys(CUR).map(k => `<button class="depc ${S.cur === k ? 'on' : ''}" data-vc="${k}"><span class="chip" data-c="${k}" style="--cs:${JSON.stringify(CUR[k].s).replace(/"/g, '&quot;')}"></span><span class="grow"><b>${CUR[k].t}</b><div class="muted" style="font-size:12px">${{ usdt:'Tether', ton:'Toncoin', rub:'Российский рубль', uah:'Украинская гривна' }[k]}</div></span><b>${(Math.floor(S.bal * RATES[k] * 10 ** DEC[k] + 1e-7) / 10 ** DEC[k]).toLocaleString('ru-RU', { minimumFractionDigits: DEC[k], maximumFractionDigits: DEC[k] })} ${CUR[k].n}</b></button>`).join('');
+}
+$('curList').addEventListener('click', e => { const b = e.target.closest('[data-vc]'); if (!b) return; setCur(b.dataset.vc); save(); curList(); haptic('tick'); setTimeout(closeSheet, 250) });
 function closeSheet(){ if (!sheet) return; if (sheet === 'case' && caseBusy) return; $('sh-' + sheet).classList.remove('on'); sheet = null; backBtn() }
 function backBtn(){ if (!tg || !tg.BackButton) return; (game || sheet) ? tg.BackButton.show() : tg.BackButton.hide() }
 if (tg && tg.BackButton) tg.BackButton.onClick(() => sheet ? closeSheet() : closeGame());
