@@ -14,7 +14,7 @@
   --g-bg:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.05));
   --g-brd:rgba(255,255,255,.22);
   --g-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -1px 1px rgba(255,255,255,.08),0 12px 32px rgba(5,0,30,.45);
-  --blur:blur(22px) saturate(190%);
+  --blur:blur(14px) saturate(160%);
   --btn:linear-gradient(135deg,#ecff7a,#c8ff3e 45%,#5ff0c8);
   --nav-h:74px;
 }
@@ -27,11 +27,13 @@ input{font:inherit;color:inherit}
 /* ---------- living background (gives the glass something to refract) ---------- */
 .bgfx{position:fixed;inset:0;z-index:-1;overflow:hidden;background:radial-gradient(120% 80% at 50% 0%,#0b2433,#050a12 62%)}
 .bgfx::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(200,255,62,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(200,255,62,.05) 1px,transparent 1px);background-size:34px 34px;-webkit-mask:radial-gradient(90% 60% at 50% 20%,#000,transparent);mask:radial-gradient(90% 60% at 50% 20%,#000,transparent)}
-.blob{position:absolute;border-radius:50%;filter:blur(64px);opacity:.7;animation:float 18s ease-in-out infinite alternate}
-.b1{width:360px;height:360px;background:#00b89c;top:-90px;left:-110px}
-.b2{width:300px;height:300px;background:#6c4dff;top:28%;right:-130px;animation-duration:22s}
-.b3{width:340px;height:340px;background:#0a6cff;bottom:-130px;left:5%;opacity:.5;animation-duration:26s}
-.b4{width:200px;height:200px;background:#b8ff3a;top:58%;left:-70px;opacity:.28;animation-duration:20s}
+/* static pre-blurred gradients: no filter, no animation → cheap on phones */
+.blob{position:absolute;border-radius:50%;opacity:.75}
+.b1{width:520px;height:520px;background:radial-gradient(circle,rgba(0,184,156,.75),transparent 65%);top:-200px;left:-220px}
+.b2{width:460px;height:460px;background:radial-gradient(circle,rgba(108,77,255,.7),transparent 65%);top:22%;right:-240px}
+.b3{width:500px;height:500px;background:radial-gradient(circle,rgba(10,108,255,.45),transparent 65%);bottom:-240px;left:-60px}
+.b4{width:320px;height:320px;background:radial-gradient(circle,rgba(184,255,58,.22),transparent 65%);top:52%;left:-150px}
+body.ingame .app,body.ingame .bgfx{visibility:hidden}
 @keyframes float{to{transform:translate(60px,80px) scale(1.15)}}
 
 /* ---------- liquid glass primitive ---------- */
@@ -39,6 +41,9 @@ input{font:inherit;color:inherit}
 .glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   background:radial-gradient(120% 60% at 20% -10%,rgba(255,255,255,.28),transparent 55%),radial-gradient(80% 50% at 110% 120%,rgba(255,255,255,.10),transparent 60%)}
 .glass>*{position:relative}
+/* real backdrop blur only on the few floating layers; everything else fakes it with a translucent gradient */
+.tab .glass,.gscreen .glass,.sheet .body .glass{-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.04))}
+.gscreen .ghead.glass{background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.06))}
 .gbtn{position:relative;border-radius:999px;font-weight:800;color:#0a1606;background:var(--btn);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 6px rgba(0,80,60,.3),0 8px 24px rgba(160,255,80,.28);transition:transform .15s,filter .2s}
 .gbtn::after{content:"";position:absolute;left:12%;right:12%;top:2px;height:45%;border-radius:999px;background:linear-gradient(rgba(255,255,255,.45),rgba(255,255,255,0));pointer-events:none}
 .gbtn:active,.press:active{transform:scale(.96)}
@@ -50,12 +55,27 @@ input{font:inherit;color:inherit}
 .top{position:sticky;top:8px;z-index:20;display:flex;align-items:center;gap:8px;padding:8px;border-radius:999px;margin-bottom:14px}
 .logo{font-family:Unbounded;font-weight:900;font-size:19px;padding:0 6px 0 8px;letter-spacing:-.3px;display:flex;align-items:center;gap:6px;margin-right:auto}
 .logo i{font-style:normal;background:linear-gradient(90deg,#fff,#d8ffa0);-webkit-background-clip:text;background-clip:text;color:transparent}
-.logo svg{width:26px;height:26px;flex:none;filter:drop-shadow(0 0 8px rgba(200,255,62,.55));animation:wob 6s ease-in-out infinite}
+.logo svg{width:26px;height:26px;flex:none;filter:drop-shadow(0 0 8px rgba(200,255,62,.55));transform:rotate(-6deg)}
 @keyframes wob{50%{transform:rotate(14deg) scale(1.06)}}
 .balpill{display:flex;align-items:center;gap:7px;padding:6px 10px 6px 6px;border-radius:999px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.14);font-weight:800;font-size:15px}
 .balpill .car{font-size:10px;opacity:.6}
 .chip{width:24px;height:24px;border-radius:50%;flex:none;background:radial-gradient(circle at 35% 30%,#fff6b0,#ffd23f 45%,#c98a00);box-shadow:0 0 12px rgba(255,210,63,.55),inset 0 -2px 3px rgba(0,0,0,.25);display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:#6b4300;font-weight:900}
-.chip::after{content:"P"}
+.chip::after{content:var(--cs,"P")}
+body[data-cur=rub] .chip{background:radial-gradient(circle at 35% 30%,#cfe0ff,#3b7bff 48%,#1a3fa8);box-shadow:0 0 12px rgba(59,123,255,.55);color:#fff}
+body[data-cur=uah] .chip{background:linear-gradient(180deg,#4d8bff 0 50%,#ffd23f 50%);box-shadow:0 0 12px rgba(255,210,63,.45);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+body[data-cur=usdt] .chip{background:radial-gradient(circle at 35% 30%,#b6f5df,#26a17b 48%,#0d5c44);box-shadow:0 0 12px rgba(38,161,123,.55);color:#fff}
+body[data-cur=ton] .chip{background:radial-gradient(circle at 35% 30%,#bfeaff,#0098ea 48%,#00508a);box-shadow:0 0 12px rgba(0,152,234,.55);color:#fff}
+.top .balpill{position:relative}
+.top .balpill::before{content:"ДЕМО";position:absolute;top:-6px;left:50%;transform:translateX(-50%);font:800 8px/1 Inter;letter-spacing:.5px;padding:2px 5px;border-radius:6px;background:#c8ff3e;color:#0a1606}
+.curseg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
+.curseg button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 0;border-radius:16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);font-size:11px;font-weight:700}
+.curseg button.on{border-color:var(--lime);background:rgba(200,255,62,.14);box-shadow:0 0 14px rgba(200,255,62,.25)}
+.curseg .chip{width:26px;height:26px}
+.curseg .chip[data-c=chip]{background:radial-gradient(circle at 35% 30%,#fff6b0,#ffd23f 45%,#c98a00);color:#6b4300;box-shadow:0 0 10px rgba(255,210,63,.5)}
+.curseg .chip[data-c=rub]{background:radial-gradient(circle at 35% 30%,#cfe0ff,#3b7bff 48%,#1a3fa8);color:#fff;box-shadow:0 0 10px rgba(59,123,255,.5)}
+.curseg .chip[data-c=uah]{background:linear-gradient(180deg,#4d8bff 0 50%,#ffd23f 50%);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);box-shadow:0 0 10px rgba(255,210,63,.4)}
+.curseg .chip[data-c=usdt]{background:radial-gradient(circle at 35% 30%,#b6f5df,#26a17b 48%,#0d5c44);color:#fff;box-shadow:0 0 10px rgba(38,161,123,.5)}
+.curseg .chip[data-c=ton]{background:radial-gradient(circle at 35% 30%,#bfeaff,#0098ea 48%,#00508a);color:#fff;box-shadow:0 0 10px rgba(0,152,234,.5)}
 .topup{padding:10px 13px;font-size:13px;white-space:nowrap}
 .top{gap:6px;padding:6px}
 .logo{font-size:17px;padding:0 2px 0 8px}
@@ -104,20 +124,21 @@ input{font:inherit;color:inherit}
 @property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
 .gcard{--c:#c8ff3e;--cg:rgba(200,255,62,.45);position:relative;height:214px;border-radius:26px;overflow:hidden;text-align:left;
   background:radial-gradient(110% 70% at 50% 0%,var(--cg),transparent 72%),linear-gradient(170deg,rgba(255,255,255,.11),rgba(255,255,255,.02));
-  -webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 14px 30px rgba(0,0,0,.45);transition:transform .2s}
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 10px 22px rgba(0,0,0,.4);transition:transform .2s;contain:paint}
 .gcard:active{transform:scale(.97)}
 .gcard::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;
-  background:conic-gradient(from var(--ang),var(--c),rgba(255,255,255,.08) 25%,rgba(255,255,255,.7) 50%,rgba(255,255,255,.08) 75%,var(--c));
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:ang 7s linear infinite}
+  background:linear-gradient(150deg,var(--c),rgba(255,255,255,.06) 35%,rgba(255,255,255,.05) 65%,var(--c));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 @keyframes ang{to{--ang:360deg}}
 .gcard::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(rgba(255,255,255,.09) 1px,transparent 1.2px);background-size:12px 12px;-webkit-mask:linear-gradient(#000,transparent 70%);mask:linear-gradient(#000,transparent 70%)}
 .gcard .num{position:absolute;top:14px;left:16px;font-family:Unbounded;font-weight:900;font-size:12px;color:var(--c);letter-spacing:1px;z-index:1}
 .gcard .max{position:absolute;top:10px;right:10px;z-index:1;font-size:11px;font-weight:800;padding:5px 9px;border-radius:999px;background:rgba(0,0,0,.4);border:1px solid var(--cg);color:var(--c)}
 .gcard .halo{position:absolute;left:50%;top:45%;width:130px;height:130px;margin:-65px 0 0 -65px;border-radius:50%;background:radial-gradient(circle,var(--cg),transparent 68%)}
-.gcard .ring{position:absolute;left:50%;top:45%;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;border:1.5px dashed var(--cg);animation:spin 20s linear infinite}
+.gcard .ring{position:absolute;left:50%;top:45%;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;border:1.5px dashed var(--cg)}
 @keyframes spin{to{transform:rotate(360deg)}}
 .gcard .art{position:absolute;left:50%;top:45%;width:110px;margin-left:-55px;transform:translateY(-50%);text-align:center;font-size:66px;line-height:1}
-.gcard .art span{display:inline-block;filter:drop-shadow(0 10px 16px rgba(0,0,0,.55));animation:bob 4s ease-in-out infinite}
+.gcard .art span{display:inline-block;filter:drop-shadow(0 8px 10px rgba(0,0,0,.5));transition:transform .3s}
+.gcard:active .art span{transform:scale(1.1) rotate(-6deg)}
 @keyframes bob{50%{transform:translateY(-7px) rotate(4deg)}}
 .gcard .foot{position:absolute;left:14px;right:12px;bottom:12px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;z-index:1}
 .gcard .foot b{font-family:Unbounded;font-size:15px;display:block;line-height:1.15}
@@ -216,7 +237,7 @@ input{font:inherit;color:inherit}
 @keyframes slidein{from{opacity:0;transform:translateY(30px)}}
 .gscreen .inner{max-width:520px;margin:0 auto;padding:10px 14px 40px}
 .ghead{display:flex;align-items:center;gap:10px;margin:2px 0 14px;padding:6px;border-radius:999px}
-.ghead h2{margin:0;font-size:18px;flex:1;font-family:Unbounded}
+.ghead h2{margin:0;font-size:17px;flex:1;font-family:Unbounded;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .back{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);font-size:18px}
 .ghead .balpill{margin-left:auto}
 .panel{padding:14px;margin-bottom:12px}
@@ -326,21 +347,23 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
 .slwin{white-space:nowrap}.slwin b{color:var(--lime);font-size:16px;margin-left:4px}
 .fsbar{display:none;justify-content:space-between;font-size:13px;font-weight:700;padding:8px 12px;margin-bottom:8px;border-radius:14px;background:rgba(255,210,63,.15);border:1px solid rgba(255,210,63,.5);color:#ffe9a0}
 .slotwrap.fs .fsbar{display:flex}
+.fsbar .bump b{display:inline-block;animation:bump .6s cubic-bezier(.2,1.8,.4,1)}
+@keyframes bump{0%{transform:scale(1.9);color:#fff}}
 .sgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;position:relative;overflow:hidden;padding:4px;margin:-4px;border-radius:18px}
 .sc{aspect-ratio:1;position:relative}
-.sy{position:absolute;inset:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(20px,7.2vw,34px);
-  background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.35),transparent 32%),radial-gradient(circle at 50% 60%,var(--cc,rgba(255,255,255,.1)),rgba(8,14,28,.92) 74%);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),inset 0 -4px 8px rgba(0,0,0,.35);will-change:transform}
-.sy span{filter:drop-shadow(0 3px 4px rgba(0,0,0,.5));line-height:1}
+/* gift tiles in the style of collectible gift cards: coloured backdrop + pattern + glossy top */
+.sy{position:absolute;inset:0;border-radius:24%;display:flex;align-items:center;justify-content:center;font-size:clamp(20px,7vw,33px);overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.28),transparent 38%),radial-gradient(rgba(255,255,255,.13) 1px,transparent 1.4px) 0 0/7px 7px,radial-gradient(circle at 50% 42%,var(--ga,#2a3550),var(--gb,#0b1222) 78%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.2),inset 0 -3px 0 rgba(0,0,0,.25)}
+.sy span{filter:drop-shadow(0 3px 3px rgba(0,0,0,.45));line-height:1}
 .sy.hit{animation:hit .55s ease-in-out infinite alternate;box-shadow:inset 0 0 0 2px var(--c,#fff),0 0 18px var(--c,#fff);z-index:2}
 @keyframes hit{to{transform:scale(1.12)}}
 .sy.pop{transform:scale(0)!important;opacity:0;transition:transform .22s ease-in,opacity .22s!important}
-.sy.scat{--c:#ffd23f;--cc:rgba(255,210,63,.5)}
-.sy.scat::before{content:"";position:absolute;inset:2px;border-radius:50%;border:2px dashed rgba(255,230,140,.8);animation:spin 6s linear infinite}
-.sy.orb{font-family:Unbounded;font-weight:900;font-size:clamp(11px,3.6vw,16px);color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.6);--c:#3ee8ff;
-  background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.7),transparent 30%),radial-gradient(circle,var(--cc),rgba(8,14,28,.9) 80%);animation:orbg 1.6s ease-in-out infinite}
+.sy.scat{--c:#ffd23f;--ga:#ffe98a;--gb:#9a5a00;box-shadow:inset 0 0 0 2px #ffe27a,0 0 12px rgba(255,210,63,.6)}
+.sy.scat::after{content:"BONUS";position:absolute;bottom:6%;font:900 clamp(6px,1.8vw,9px)/1 Unbounded;color:#3a2200;background:#ffe27a;padding:2px 4px;border-radius:4px}
+.sy.orb{border-radius:50%;font-family:Unbounded;font-weight:900;font-size:clamp(11px,3.6vw,16px);color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.6);--c:#3ee8ff;
+  background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.75),transparent 30%),radial-gradient(circle,var(--cc),rgba(8,14,28,.9) 80%);box-shadow:0 0 12px var(--c),inset 0 0 0 1px rgba(255,255,255,.5)}
 .sy.orb.o1{--cc:#1fb97a;--c:#3dfc9f}.sy.orb.o2{--cc:#1b78ff;--c:#3ee8ff}.sy.orb.o3{--cc:#9b3dff;--c:#d38bff}.sy.orb.o4{--cc:#ff9d00;--c:#ffd23f}
-@keyframes orbg{50%{box-shadow:0 0 16px var(--c),inset 0 0 0 1px rgba(255,255,255,.5)}}
 .sover{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;pointer-events:none;opacity:0;transition:opacity .25s;z-index:5;background:radial-gradient(circle,rgba(5,10,18,.75),rgba(5,10,18,.2) 70%)}
 .sover.on{opacity:1}
 .sover b{font-family:Unbounded;font-weight:900;font-size:clamp(26px,9vw,44px);background:linear-gradient(180deg,#fff,#ffe27a 60%,#ffb800);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 14px rgba(0,0,0,.7));animation:zoom .5s cubic-bezier(.2,1.6,.4,1)}
@@ -400,9 +423,9 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
   <!-- ============ GAMES TAB ============ -->
   <section class="tab on" id="t-games">
     <div class="hero" id="hero">
-      <div class="slide sl1"><div><h3>Бонус каждый день</h3><p>Заходи 7 дней подряд и получи до 2 000 фишек</p></div><button class="gbtn" data-tab="bonus">Забрать ›</button><div class="art">🎁</div></div>
-      <div class="slide sl2"><div><h3>Бесплатный кейс</h3><p>Открывай раз в 4 часа, внутри до 1 000 фишек</p></div><button class="gbtn" data-tab="cases">Открыть ›</button><div class="art">🧰</div></div>
-      <div class="slide sl3"><div><h3>Слот Галактика</h3><p>Каскады, сферы до ×100 и покупка бонуса</p></div><button class="gbtn" data-go="slot">Крутить ›</button><div class="art">👽</div></div>
+      <div class="slide sl1"><div><h3>Бонус каждый день</h3><p>Заходи 7 дней подряд и получи до 2 000 на баланс</p></div><button class="gbtn" data-tab="bonus">Забрать ›</button><div class="art">🎁</div></div>
+      <div class="slide sl2"><div><h3>Бесплатный кейс</h3><p>Открывай раз в 4 часа, внутри до 1 000 на баланс</p></div><button class="gbtn" data-tab="cases">Открыть ›</button><div class="art">🧰</div></div>
+      <div class="slide sl3"><div><h3>Слот Gift Rush</h3><p>Подарки, сферы до ×100 и покупка бонуса</p></div><button class="gbtn" data-go="slot">Крутить ›</button><div class="art">🎁</div></div>
     </div>
     <div class="dots" id="dots"><i class="on"></i><i></i><i></i></div>
 
@@ -414,7 +437,7 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
 
   <!-- ============ CASES TAB ============ -->
   <section class="tab" id="t-cases">
-    <div class="h">Кейсы <small>фишки внутри</small></div>
+    <div class="h">Кейсы <small>призы на баланс</small></div>
     <div class="cgrid" id="caseGrid"></div>
   </section>
 
@@ -462,9 +485,10 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
     </div>
     <div class="glass card">
       <div class="row"><div class="grow">Вибрация</div><button class="switch on" id="hapSw"></button></div>
+      <div class="lbl" style="margin-top:14px">Валюта отображения</div><div class="curseg" id="curSeg2"></div>
       <div class="row" style="margin-top:14px"><div class="grow muted">Начать заново: баланс 1 000, прогресс обнулится</div><button class="ghostbtn" id="resetBtn">Сброс</button></div>
     </div>
-    <div class="muted" style="text-align:center;font-size:11px;line-height:1.5;padding:4px 20px">Фишки виртуальные и бесплатные. Их нельзя купить, продать или вывести. Играем ради фана 🙂</div>
+    <div class="muted" style="text-align:center;font-size:11px;line-height:1.5;padding:4px 20px">Это демо-баланс: валюта показана для красоты. Реальные деньги здесь не вносятся и не выводятся. Играем ради фана 🙂</div>
   </section>
 </div>
 
@@ -571,17 +595,17 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
 </div></section>
 
 <section class="gscreen" id="g-slot"><div class="inner">
-  <div class="ghead glass"><button class="back">←</button><h2>👽 Галактика</h2><button class="back" data-sheet="pay" style="font-size:15px">i</button><div class="balpill"><span class="chip"></span><span class="balv">0</span></div></div>
+  <div class="ghead glass"><button class="back">←</button><h2>🎁 Gift Rush</h2><button class="back" data-sheet="pay" style="font-size:15px">i</button><div class="balpill"><span class="chip"></span><span class="balv">0</span></div></div>
   <div class="slotwrap glass" id="slotWrap">
     <div class="sbar"><span id="slInfo">Собери 8+ одинаковых где угодно</span><span class="slwin">Выигрыш <b id="slWin">0</b></span></div>
-    <div class="fsbar" id="fsBar"><span>🌟 Фриспины: <b id="fsLeft">15</b></span><span>Множитель <b id="fsMult">×0</b></span></div>
+    <div class="fsbar" id="fsBar"><span>🎁 Фриспины: <b id="fsLeft">15</b></span><span>Множитель <b id="fsMult">—</b></span></div>
     <div class="sgrid" id="sGrid"></div>
     <div class="sover" id="sOver"></div>
   </div>
   <div class="panel glass">
     <div class="lbl">Ставка за спин</div><div class="bet" data-bet="slot"></div>
     <div class="slctl">
-      <button class="slbox buy press" id="slBuy"><span class="bi">🌟</span><b>Купить бонус</b><small id="slBuyCost">5 000</small></button>
+      <button class="slbox buy press" id="slBuy"><span class="bi">🎁</span><b>Купить бонус</b><small id="slBuyCost">5 000</small></button>
       <button class="slspin" id="slSpin"><span>↻</span></button>
       <button class="slbox ante press" id="slAnte"><span class="switch" id="slAnteSw"></span><b>Двойной шанс</b><small id="slAnteCost">ставка 63</small></button>
     </div>
@@ -592,22 +616,23 @@ input[type=range]{width:100%;accent-color:#9a8cff;height:28px}
 <!-- ============ SHEETS ============ -->
 <div class="sheet" id="sh-pay"><div class="bd"></div><div class="body glass">
   <div class="grab"></div>
-  <h3>👽 Галактика: правила</h3>
+  <h3>🎁 Gift Rush: правила</h3>
   <div class="muted" style="line-height:1.5;margin:6px 0 12px">Поле 6×5. Выигрыш даёт 8 и больше одинаковых символов в любом месте поля. Выигравшие символы лопаются, сверху падают новые, и так пока есть выигрыш (каскад).</div>
   <div id="payList"></div>
   <div class="glass card" style="margin-top:12px;line-height:1.5;font-size:13px">
     <b>💠 Сферы-множители</b> (×2 – ×100). Если в конце каскада был выигрыш, все сферы на поле складываются и умножают его.<br><br>
-    <b>🌟 Бонус.</b> 4+ звезды дают 15 фриспинов (и сразу ×3 / ×5 / ×100 от ставки за 4 / 5 / 6 звёзд). Во фриспинах сферы падают чаще, а их значения копятся в общий множитель на весь бонус. 3+ звезды во фриспинах: +5 вращений.<br><br>
+    <b>🎁 Бонус.</b> 4+ подарка BONUS дают 15 фриспинов (и сразу ×3 / ×5 / ×100 от ставки за 4 / 5 / 6 подарков). Во фриспинах каждая упавшая сфера сразу добавляется в общий множитель, и он умножает все выигрыши до конца бонуса. 3+ подарка во фриспинах: +5 вращений.<br><br>
     <b>🛒 Купить бонус</b>: сразу фриспины за 100 ставок.<br>
-    <b>⚡ Двойной шанс</b>: ставка ×1.25, звёзды выпадают чаще.<br><br>
+    <b>⚡ Двойной шанс</b>: ставка ×1.25, подарки BONUS выпадают чаще.<br><br>
     <span class="muted">Отдача ≈ 50%. Максимальный выигрыш ×5 000 от ставки.</span>
   </div>
 </div></div>
 <div class="sheet" id="sh-wallet"><div class="bd"></div><div class="body glass">
   <div class="grab"></div>
   <h3>Пополнить баланс</h3>
-  <div class="muted">Фишки бесплатные. Каждый пакет можно забирать снова, когда пройдёт таймер.</div>
+  <div class="muted">Демо-баланс пополняется бесплатно. Каждый пакет можно забирать снова, когда пройдёт таймер.</div>
   <div class="glass card row" style="margin:14px 0 0"><span class="chip" style="width:40px;height:40px;font-size:16px"></span><div class="grow"><div class="muted">Сейчас на балансе</div><div class="big balv">0</div></div></div>
+  <div class="lbl" style="margin-top:14px">Валюта отображения</div><div class="curseg" id="curSeg1"></div>
   <div id="packs"></div>
 </div></div>
 
@@ -626,9 +651,9 @@ const tg = window.Telegram && window.Telegram.WebApp;
 const $ = id => document.getElementById(id);
 const fmt = n => Math.floor(n).toLocaleString('ru-RU');
 const H = 36e5, DAY = 864e5;
-const GAMES = { mines:['💎','Мины'], bj:['🃏','Блэкджек'], crash:['🚀','Ракета'], dice:['🎲','Дайс'], plinko:['🔮','Плинко'], flight:['🛩️','Полёт'], up:['⚡','Апгрейд'], slot:['👽','Галактика'], case:['🧰','Кейс'] };
+const GAMES = { mines:['💎','Мины'], bj:['🃏','Блэкджек'], crash:['🚀','Ракета'], dice:['🎲','Дайс'], plinko:['🔮','Плинко'], flight:['🛩️','Полёт'], up:['⚡','Апгрейд'], slot:['🎁','Gift Rush'], case:['🧰','Кейс'] };
 const CARDS = [
-  { g:'slot',   c:'c-slot',   e:'👽', n:'Галактика', d:'Слот с каскадами, сферами-множителями и покупкой бонуса', max:'×5000', wide:1 },
+  { g:'slot',   c:'c-slot',   e:'🎁', n:'Gift Rush', d:'Слот с подарками: каскады, сферы-множители и покупка бонуса', max:'×5000', wide:1 },
   { g:'up',     c:'c-up',     e:'⚡', n:'Апгрейд',   d:'Сам выбираешь шанс',  max:'до ×97' },
   { g:'mines',  c:'c-mines',  e:'💎', n:'Мины',      d:'Не попади на бомбу',  max:'×24K' },
   { g:'flight', c:'c-flight', e:'🛩️', n:'Полёт',     d:'Самолётик ловит иксы и набирает высоту. Сядь на авианосец и забери всё', max:'NEW', wide:1 },
@@ -685,7 +710,7 @@ function render(flash){
 }
 function take(bet, game){
   if (!(bet >= 1)) { toast('Минимальная ставка — 1', 'l'); haptic('err'); return false }
-  if (bet > S.bal) { toast('Не хватает фишек — пополни баланс', 'l'); haptic('err'); setTimeout(() => openSheet('wallet'), 500); return false }
+  if (bet > S.bal) { toast('Не хватает средств, пополни баланс', 'l'); haptic('err'); setTimeout(() => openSheet('wallet'), 500); return false }
   S.bal -= bet; S.played++; S.wagered += bet; S.tried[game] = 1; save(); render(); return true;
 }
 function pay(bet, amount, game){
@@ -695,6 +720,16 @@ function pay(bet, amount, game){
   S.hist.unshift({ g: game, b: bet, w: amount, t: Date.now() }); S.hist = S.hist.slice(0, 30);
   save(); render(amount > 0); renderTicker(); taskBadge();
 }
+
+/* ---------- currency (display only, demo balance) ---------- */
+const CUR = { chip:{ s:"P", n:"фишек", t:"Фишки" }, rub:{ s:"₽", n:"₽", t:"RUB" }, uah:{ s:"₴", n:"₴", t:"UAH" }, usdt:{ s:"₮", n:"USDT", t:"USDT" }, ton:{ s:"◆", n:"TON", t:"TON" } };
+const cn = () => (CUR[S.cur] || CUR.chip).n;
+function setCur(c){
+  if (!CUR[c]) c = "chip"; S.cur = c; document.body.dataset.cur = c;
+  document.body.style.setProperty("--cs", JSON.stringify(CUR[c].s));
+  ["curSeg1", "curSeg2"].forEach(id => { const el = $(id); if (el) el.innerHTML = Object.keys(CUR).map(k => `<button data-cur="${k}" class="${k === c ? "on" : ""}"><span class="chip" data-c="${k}" style="--cs:${JSON.stringify(CUR[k].s).replace(/"/g, "&quot;")}"></span>${CUR[k].t}</button>`).join("") });
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-cur]"); if (!b || !b.parentElement.classList.contains("curseg")) return; setCur(b.dataset.cur); save(); haptic("tick"); toast("Валюта: " + CUR[S.cur].t) });
 
 /* ---------- bet control ---------- */
 const bets = {};
@@ -733,7 +768,7 @@ function tab(name){
 }
 function openGame(name){
   closeSheet();
-  game = name; $('g-' + name).classList.add('on'); $('nav').classList.add('hide'); document.body.style.overflow = 'hidden';
+  game = name; $('g-' + name).classList.add('on'); $('nav').classList.add('hide'); document.body.style.overflow = 'hidden'; document.body.classList.add('ingame');
   if (name === 'crash') crash.resize();
   if (name === 'plinko') plinko.resize();
   if (name === 'flight') flight.resize();
@@ -743,7 +778,7 @@ function openGame(name){
 function closeGame(silent){
   if (!game) return true;
   if (busy[game]){ if (!silent){ toast('Сначала доиграй раунд', 'l'); haptic('err') } return false }
-  $('g-' + game).classList.remove('on'); game = null; $('nav').classList.remove('hide'); document.body.style.overflow = ''; backBtn(); return true;
+  $('g-' + game).classList.remove('on'); game = null; $('nav').classList.remove('hide'); document.body.style.overflow = ''; document.body.classList.remove('ingame'); backBtn(); return true;
 }
 function openSheet(name){ closeSheet(); sheet = name; $('sh-' + name).classList.add('on'); if (name === 'wallet') renderPacks(); haptic('light'); backBtn() }
 function closeSheet(){ if (!sheet) return; if (sheet === 'case' && caseBusy) return; $('sh-' + sheet).classList.remove('on'); sheet = null; backBtn() }
@@ -805,7 +840,7 @@ function renderPacks(){
 $('packs').addEventListener('click', e => {
   const id = e.target.dataset.pack; if (!id) return;
   const p = PACKS.find(x => x.id === id); if ((S.packs[id] || 0) + p.cd > Date.now()) return;
-  S.packs[id] = Date.now(); S.bal += p.amt; save(); render(true); renderPacks(); haptic('ok'); confetti(); toast('+' + fmt(p.amt) + ' фишек', 'w');
+  S.packs[id] = Date.now(); S.bal += p.amt; save(); render(true); renderPacks(); haptic('ok'); confetti(); toast('+' + fmt(p.amt) + ' ' + cn(), 'w');
 });
 
 /* ======================= CASES ======================= */
@@ -831,7 +866,7 @@ $('caseGrid').addEventListener('click', e => {
   const b = e.target.closest('[data-case]'); if (!b) return;
   caseCur = CASES.find(c => c.id === b.dataset.case);
   $('caseTitle').textContent = caseCur.e + ' ' + caseCur.name + ' кейс';
-  $('caseSub').textContent = caseCur.price ? 'Стоимость: ' + fmt(caseCur.price) + ' фишек' : 'Открывается бесплатно раз в 4 часа';
+  $('caseSub').textContent = caseCur.price ? 'Стоимость: ' + fmt(caseCur.price) + ' ' + cn() : 'Открывается бесплатно раз в 4 часа';
   const tot = caseCur.w.reduce((a, b) => a + b, 0);
   $('plist').innerHTML = caseCur.prizes.map((p, i) => `<div class="prize" style="--rc:${RC[i]}">${fmt(p)}<small>${(caseCur.w[i] / tot * 100).toFixed(caseCur.w[i] / tot < .02 ? 1 : 0)}%</small></div>`).join('');
   fillStrip(null); caseBtn(); openSheet('case');
@@ -862,7 +897,7 @@ $('caseOpen').onclick = () => {
     pay(c.price || 0, prize, 'case');
     if (!c.price) { S.played++; save() }
     caseBusy = false; caseBtn(); renderCases(); caseBadgeUpd();
-    toast((win >= 4 ? '🔥 ' : '') + 'Выпало ' + fmt(prize) + ' фишек!', 'w'); if (win >= 4 || prize > (c.price || 300) * 2) confetti();
+    toast((win >= 4 ? '🔥 ' : '') + 'Выпало ' + fmt(prize) + ' ' + cn() + '!', 'w'); if (win >= 4 || prize > (c.price || 300) * 2) confetti();
   }, 5200);
 };
 
@@ -886,13 +921,13 @@ function renderBonus(){
 $('dailyBtn').onclick = () => {
   const d = dailyState(); if (d.claimed) return;
   S.streak = d.streak + 1; S.lastDaily = dk(Date.now()); S.bal += DAILY[d.idx];
-  save(); render(true); renderBonus(); haptic('ok'); confetti(); toast('+' + fmt(DAILY[d.idx]) + ' фишек!', 'w');
+  save(); render(true); renderBonus(); haptic('ok'); confetti(); toast('+' + fmt(DAILY[d.idx]) + ' ' + cn() + '!', 'w');
 };
 const TASKS = [
   { id:'p10',  e:'🎮', n:'Сыграй 10 раз',          r:300,  v:() => S.played, goal:10 },
   { id:'w5',   e:'🏆', n:'Выиграй 5 раз',          r:300,  v:() => S.won, goal:5 },
   { id:'all8', e:'🧭', n:'Попробуй все 8 игр',      r:1500, v:() => ['mines','bj','crash','dice','plinko','flight','up','slot'].filter(g => S.tried[g]).length, goal:8 },
-  { id:'wag',  e:'💸', n:'Поставь 10 000 фишек',   r:1000, v:() => S.wagered, goal:10000 },
+  { id:'wag',  e:'💸', n:'Поставь в сумме 10 000',   r:1000, v:() => S.wagered, goal:10000 },
   { id:'x10',  e:'🚀', n:'Поймай множитель ×10',   r:1500, v:() => Math.floor(S.bestMult), goal:10 },
   { id:'p100', e:'🔥', n:'Сыграй 100 раз',         r:2500, v:() => S.played, goal:100 },
 ];
@@ -939,7 +974,7 @@ function renderProfile(){
 }
 $('hapSw').onclick = () => { S.haptics = !S.haptics; save(); renderProfile(); haptic('medium') };
 $('resetBtn').onclick = () => {
-  const go = () => { const h = S.haptics; S = JSON.parse(JSON.stringify(DEF)); S.haptics = h; save(); render(true); renderProfile(); renderTicker(); caseBadgeUpd(); toast('Прогресс сброшен') };
+  const go = () => { const h = S.haptics, cu = S.cur; S = JSON.parse(JSON.stringify(DEF)); S.haptics = h; S.cur = cu; save(); render(true); renderProfile(); renderTicker(); caseBadgeUpd(); toast('Прогресс сброшен') };
   if (tg && tg.showConfirm && tg.isVersionAtLeast && tg.isVersionAtLeast('6.2')) tg.showConfirm('Сбросить баланс и весь прогресс?', ok => ok && go());
   else if (confirm('Сбросить баланс и весь прогресс?')) go();
 };
@@ -1042,7 +1077,7 @@ const crash = (() => {
   const cv = $('cCanvas'), x = cv.getContext('2d'), multEl = $('cMult');
   let state = 'idle', t0 = 0, crashAt = 1, bet = 0, cashed = false, cur = 1, pts = [], Wd = 0, Hd = 0, hist = [];
   const K = 0.00011;
-  function resize(){ const r = cv.getBoundingClientRect(), d = devicePixelRatio || 1; Wd = r.width; Hd = r.height; cv.width = Wd * d; cv.height = Hd * d; x.setTransform(d, 0, 0, d, 0, 0); draw() }
+  function resize(){ const r = cv.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1); Wd = r.width; Hd = r.height; cv.width = Wd * d; cv.height = Hd * d; x.setTransform(d, 0, 0, d, 0, 0); draw() }
   function draw(){
     x.clearRect(0, 0, Wd, Hd);
     x.strokeStyle = 'rgba(255,255,255,.08)'; x.lineWidth = 1;
@@ -1117,13 +1152,13 @@ const plinko = (() => {
   const ROWS = 10, MULTS = [22, 5, 2, 1.3, 0.7, 0.3, 0.7, 1.3, 2, 5, 22];
   const cv = $('pCanvas'), x = cv.getContext('2d');
   let Wd = 0, Hd = 0, gap = 0, top = 0, balls = [], flashes = {}, running = false;
-  function resize(){ const d = devicePixelRatio || 1; Wd = cv.getBoundingClientRect().width || 340; gap = Wd / (ROWS + 2); Hd = gap * (ROWS + 2.4);
+  function resize(){ const d = Math.min(2, devicePixelRatio || 1); Wd = cv.getBoundingClientRect().width || 340; gap = Wd / (ROWS + 2); Hd = gap * (ROWS + 2.4);
     top = gap * .9; cv.style.height = Hd + 'px'; cv.width = Wd * d; cv.height = Hd * d; x.setTransform(d, 0, 0, d, 0, 0); draw() }
   const pegX = (r, i) => Wd / 2 + (i - r / 2) * gap, rowY = r => top + r * gap;
   const slotColor = m => m >= 5 ? '#ff4f7b' : m >= 2 ? '#ff9a3d' : m >= 1 ? '#ffd23f' : '#8a90b8';
   function draw(){
     x.clearRect(0, 0, Wd, Hd);
-    for (let r = 2; r <= ROWS + 1; r++) for (let i = 0; i <= r; i++){ x.beginPath(); x.arc(pegX(r, i), rowY(r - 1.5), Math.max(2.5, gap * .09), 0, 7); x.fillStyle = 'rgba(255,255,255,.85)'; x.shadowColor = '#b8adff'; x.shadowBlur = 6; x.fill(); x.shadowBlur = 0 }
+    for (let r = 2; r <= ROWS + 1; r++) for (let i = 0; i <= r; i++){ x.beginPath(); x.arc(pegX(r, i), rowY(r - 1.5), Math.max(2.5, gap * .09), 0, 7); x.fillStyle = 'rgba(255,255,255,.85)'; x.fill() }
     const sy = rowY(ROWS + .2), sw = gap * .92;
     MULTS.forEach((m, i) => {
       const cx = Wd / 2 + (i - ROWS / 2) * gap, f = flashes[i] ? Math.max(0, flashes[i] - performance.now()) / 300 : 0, yy = sy + f * 4;
@@ -1193,7 +1228,7 @@ const flight = (() => {
     const j = a.aft - a.arr, base = a.aft + (b.arr - a.aft) * f;
     return Math.max(0, base - (i > 0 ? j * (1 - ease(f / .35)) : 0));
   }
-  function resize(){ const r = cv.getBoundingClientRect(), d = devicePixelRatio || 1; Wd = r.width; Hd = r.height; cv.width = Wd * d; cv.height = Hd * d; x.setTransform(d, 0, 0, d, 0, 0); draw(R ? R.t : -TAKEOFF, performance.now()) }
+  function resize(){ const r = cv.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1); Wd = r.width; Hd = r.height; cv.width = Wd * d; cv.height = Hd * d; x.setTransform(d, 0, 0, d, 0, 0); draw(R ? R.t : -TAKEOFF, performance.now()) }
 
   function drawPlane(px, py, ang, now, s){
     x.save(); x.translate(px, py); x.rotate(ang); x.scale(s, s);
@@ -1344,19 +1379,20 @@ const upg = (() => {
 const SLOTE = (() => {
   const COLS = 6, ROWS = 5;
   const SYMS = [
-    { e:'👽', n:'Пришелец', c:'#3dfc9f', p:[10, 25, 50],   w:13 },
-    { e:'🛸', n:'Тарелка',  c:'#3ee8ff', p:[2.5, 10, 25],  w:18 },
-    { e:'🪐', n:'Планета',  c:'#ffb13d', p:[2, 5, 15],     w:23 },
-    { e:'☄️', n:'Комета',   c:'#ff6b4a', p:[1.5, 2, 12],   w:28 },
-    { e:'🍩', n:'Пончик',   c:'#ff7ad9', p:[1, 1.5, 10],   w:34 },
-    { e:'🍭', n:'Леденец',  c:'#c77dff', p:[.8, 1.2, 8],   w:36 },
-    { e:'🧃', n:'Сок',      c:'#ffd23f', p:[.5, 1, 5],     w:38 },
-    { e:'🍓', n:'Клубника', c:'#ff4d6d', p:[.4, .9, 4],    w:40 },
-    { e:'🫐', n:'Черника',  c:'#6b8cff', p:[.25, .75, 2],  w:42 },
+    // подарки: c — свечение, a/b — «фон» коллекционной карточки (центр → край)
+    { e:'💎', n:'Алмаз',      c:'#5ad1ff', a:'#6fd8ff', b:'#123a8f', p:[10, 25, 50],  w:13 },
+    { e:'💍', n:'Кольцо',     c:'#ff9bd2', a:'#ffa9d8', b:'#6e1a52', p:[2.5, 10, 25], w:18 },
+    { e:'🏆', n:'Кубок',      c:'#ffd36b', a:'#ffd978', b:'#7a4a00', p:[2, 5, 15],    w:23 },
+    { e:'🚀', n:'Ракета',     c:'#7dffcf', a:'#86ffd4', b:'#0b5a48', p:[1.5, 2, 12],  w:28 },
+    { e:'🍾', n:'Шампанское', c:'#c4ff7a', a:'#caff86', b:'#2e5f10', p:[1, 1.5, 10],  w:34 },
+    { e:'🎂', n:'Торт',       c:'#ffb3c7', a:'#ffbdd0', b:'#8e2a4e', p:[.8, 1.2, 8],  w:36 },
+    { e:'💐', n:'Букет',      c:'#d0a8ff', a:'#d6b4ff', b:'#41248a', p:[.5, 1, 5],    w:38 },
+    { e:'🌹', n:'Роза',       c:'#ff8a8a', a:'#ff9a9a', b:'#7c0f1e', p:[.4, .9, 4],   w:40 },
+    { e:'🧸', n:'Мишка',      c:'#e8bb8e', a:'#ecc59c', b:'#5e3615', p:[.25, .75, 2], w:42 },
   ];
   const SCAT = 9, ORB = 10;
   // Отдача подобрана симуляцией (~50%): обычная игра ≈47%, «двойной шанс» ≈50%, покупка бонуса ≈50%.
-  const CFG = { scW: 4.7, anteSc: 1.2, orbBase: .0045, orbFs: .038, fsSpins: 15, retrig: 5, buy: 100, ante: 1.25, cap: 5000 };
+  const CFG = { scW: 4.7, anteSc: 1.2, orbBase: .0045, orbFs: .0092, fsSpins: 15, retrig: 5, buy: 100, ante: 1.25, cap: 5000 };
   const ORBV = [[2,300],[3,200],[4,150],[5,120],[6,80],[8,60],[10,40],[12,20],[15,15],[20,10],[25,5],[50,3],[100,1]];
   const ORBT = ORBV.reduce((a, b) => a + b[1], 0);
   const SCPAY = { 4: 3, 5: 5, 6: 100 };
@@ -1403,7 +1439,7 @@ const SLOTE = (() => {
       let left = CFG.fsSpins, gm = 0;
       while (left > 0 && fs.length < 200){
         left--; const s = spin(bet, true, false, 0);
-        if (s.tw > 0 && s.orbs > 0) gm += s.orbs;
+        if (s.orbs > 0) gm += s.orbs;          // во фриспинах каждая упавшая сфера сразу копится в общий множитель
         s.gm = gm; s.win = s.tw * (s.tw > 0 && gm > 0 ? gm : 1);
         if (s.scat >= 3){ left += CFG.retrig; s.retrig = true }
         s.left = left; total += s.win; fs.push(s);
@@ -1427,10 +1463,10 @@ const SLOTE = (() => {
   const sp = ms => new Promise(r => setTimeout(r, turbo ? ms * .4 : ms));
   const orbCls = v => v >= 50 ? 'o4' : v >= 12 ? 'o3' : v >= 6 ? 'o2' : 'o1';
   function paint(el, x){
-    el.className = 'sy'; el.style.removeProperty('--c'); el.style.removeProperty('--cc');
-    if (x.s === E.SCAT){ el.classList.add('scat'); el.innerHTML = '<span>🌟</span>' }
+    el.className = 'sy'; el.style.removeProperty('--c'); el.style.removeProperty('--ga'); el.style.removeProperty('--gb');
+    if (x.s === E.SCAT){ el.classList.add('scat'); el.innerHTML = '<span>🎁</span>' }
     else if (x.s === E.ORB){ el.classList.add('orb', orbCls(x.v)); el.innerHTML = '×' + x.v }
-    else { const s = E.SYMS[x.s]; el.style.setProperty('--c', s.c); el.style.setProperty('--cc', rgba(s.c, .45)); el.innerHTML = '<span>' + s.e + '</span>' }
+    else { const s = E.SYMS[x.s]; el.style.setProperty('--c', s.c); el.style.setProperty('--ga', s.a); el.style.setProperty('--gb', s.b); el.innerHTML = '<span>' + s.e + '</span>' }
   }
   const pitch = () => cells[0][1].parentElement.getBoundingClientRect().top - cells[0][0].parentElement.getBoundingClientRect().top || 56;
   const D = () => turbo ? .4 : 1;
@@ -1477,12 +1513,19 @@ const SLOTE = (() => {
       setWin(before + acc); await tumble(st.rm, s.steps[i + 1].grid);
     }
     const fin = s.steps[s.steps.length - 1].grid;
-    if (s.tw > 0 && s.orbs > 0){
-      mark((c, r) => fin[c][r].s === E.ORB); haptic('heavy');
-      if (fsMode){ await show('+×' + s.orbs, 'общий множитель ×' + s.gm, 1100); $('fsMult').textContent = '×' + s.gm }
-      else await show('×' + s.orbs, fmt(s.tw) + ' × ' + s.orbs + ' = ' + fmt(s.win), 1200);
+    if (fsMode){
+      if (s.orbs > 0){
+        mark((c, r) => fin[c][r].s === E.ORB); haptic('heavy');
+        $('fsMult').textContent = '×' + s.gm; $('fsMult').parentElement.classList.remove('bump'); void wrap.offsetWidth; $('fsMult').parentElement.classList.add('bump');
+        await show('+×' + s.orbs, 'общий множитель теперь ×' + s.gm, 1100);
+      }
+      if (s.tw > 0 && s.gm > 0){ await show(fmt(s.tw) + ' × ' + s.gm, '= ' + fmt(s.win), 1200); info(`Выигрыш ${fmt(s.tw)} × ${s.gm} = ${fmt(s.win)}`) }
       setWin(before + s.win);
-    } else if (fsMode && s.tw > 0 && s.gm > 0){ setWin(before + s.win); info('Выигрыш ×' + s.gm + ' (общий множитель)') }
+    } else if (s.tw > 0 && s.orbs > 0){
+      mark((c, r) => fin[c][r].s === E.ORB); haptic('heavy');
+      await show('×' + s.orbs, fmt(s.tw) + ' × ' + s.orbs + ' = ' + fmt(s.win), 1200);
+      setWin(before + s.win);
+    }
     const sc = s.scat;
     if ((fsMode && sc >= 3) || (!fsMode && sc >= 4)){ mark((c, r) => fin[c][r].s === E.SCAT); haptic('heavy'); await sp(900) }
     if (!s.tw) info(fsMode ? 'Мимо, дальше!' : 'Собери 8+ одинаковых где угодно');
@@ -1501,10 +1544,10 @@ const SLOTE = (() => {
     const R = E.round(bet, { ante, buy: opt.buy });
     let total = 0;
     await playSpin(R.base, false, 0); total += R.base.win;
-    if (R.base.scWin){ total += R.base.scWin; setWin(total); info(`🌟×${R.base.scat} = ${fmt(R.base.scWin)}`) }
+    if (R.base.scWin){ total += R.base.scWin; setWin(total); info(`🎁×${R.base.scat} = ${fmt(R.base.scWin)}`) }
     if (R.fs.length){
-      await show(E.CFG.fsSpins + ' фриспинов!', '🌟 бонус начинается', 1700);
-      wrap.classList.add('fs'); $('fsMult').textContent = '×0'; const start = total;
+      await show(E.CFG.fsSpins + ' фриспинов!', '🎁 бонус начинается', 1700);
+      wrap.classList.add('fs'); $('fsMult').textContent = '—'; const start = total;
       for (const s of R.fs){
         $('fsLeft').textContent = s.left + (s.retrig ? -E.CFG.retrig : 0);
         await playSpin(s, true, total); total += s.win; setWin(total);
@@ -1527,8 +1570,8 @@ const SLOTE = (() => {
   $('slBuy').onclick = () => {
     if (running || ante) return; const c = bets.slot.get() * E.CFG.buy;
     const ok = () => go({ buy: true });
-    if (tg && tg.showConfirm && tg.isVersionAtLeast && tg.isVersionAtLeast('6.2')) tg.showConfirm(`Купить бонус за ${fmt(c)} фишек?`, y => y && ok());
-    else if (confirm(`Купить бонус за ${fmt(c)} фишек?`)) ok();
+    if (tg && tg.showConfirm && tg.isVersionAtLeast && tg.isVersionAtLeast('6.2')) tg.showConfirm(`Купить бонус за ${fmt(c)} ${cn()}?`, y => y && ok());
+    else if (confirm(`Купить бонус за ${fmt(c)} ${cn()}?`)) ok();
   };
   $('slAnte').onclick = () => { if (running) return; ante = !ante; $('slAnte').classList.toggle('on', ante); $('slAnteSw').classList.toggle('on', ante); $('slBuy').disabled = ante; haptic('tick') };
   $('slTurbo').onclick = () => { turbo = !turbo; $('slTurbo').classList.toggle('on', turbo); haptic('tick') };
@@ -1540,13 +1583,13 @@ const SLOTE = (() => {
   bets.slot.set(20); costs();
   // таблица выплат
   $('payList').innerHTML = `<div class="payrow"><div style="width:40px"></div><div class="pv"><span><small>8–9</small></span><span><small>10–11</small></span><span><small>12+</small></span></div></div>` +
-    E.SYMS.map(s => `<div class="payrow"><div class="sy" style="--c:${s.c};--cc:${rgba(s.c, .45)}"><span>${s.e}</span></div><div class="pv">${s.p.map(v => `<b>×${v}</b>`).join('')}</div></div>`).join('');
+    E.SYMS.map(s => `<div class="payrow"><div class="sy" style="--c:${s.c};--ga:${s.a};--gb:${s.b}"><span>${s.e}</span></div><div class="pv">${s.p.map(v => `<b>×${v}</b>`).join('')}</div></div>`).join('');
   document.addEventListener('visibilitychange', () => { if (document.hidden) setAuto(false) });
 })();
 
 /* ---------- boot ---------- */
 if (tg){ try{ tg.ready(); tg.expand(); tg.setHeaderColor('#0b0820'); tg.setBackgroundColor('#0b0820'); if (tg.disableVerticalSwipes) tg.disableVerticalSwipes() }catch(e){} }
-load(() => { render(); renderTicker(); caseBadgeUpd() });
+load(() => { setCur(S.cur); render(); renderTicker(); caseBadgeUpd() });
 setInterval(() => { caseBadgeUpd(); if (sheet === 'wallet') renderPacks(); if (current === 'cases') renderCases(); if (current === 'bonus' && !game) renderBonus(); if (sheet === 'case' && caseCur) caseBtn() }, 30000);
 </script>
 </body>
